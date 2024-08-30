@@ -27,10 +27,8 @@ export async function POST(request) {
       return NextResponse.json({ error: "Invalid password" }, { status: 401 });
     }
 
-    // Generate JWT token
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
-    // Set token in cookies
     const response = NextResponse.json({ message: "Login successful" }, { status: 200 });
     response.cookies.set("authToken", token, { httpOnly: true, path: "/" });
 
