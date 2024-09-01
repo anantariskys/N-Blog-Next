@@ -31,8 +31,8 @@ const Page = ({ params }) => {
         ) : (
           user.user.image?(
             <img
-            src={user.user.image}
-            className="size-36 rounded-full object-cover"
+            src={'https://firebasestorage.googleapis.com/v0/b/n-blog-next.appspot.com/o/profile-images%2F564fb459-168b-43cb-9bc0-e0d8a6a9d55c-WhatsApp%20Image%202024-06-02%20at%2012.32.18_6c8e7ca4.jpg?alt=medi'}
+            className="size-36"
             alt=""
             />
           ):(
@@ -54,7 +54,7 @@ const Page = ({ params }) => {
               <>
                 <h1 className="text-lg">{user?.user.username}</h1>
                 <Link
-                  href={"/"}
+                  href={`/${params.userId}/update`}
                   className=" py-2  px-4 rounded-lg bg-neutral-700 text-sm"
                 >
                   Edit Profile
