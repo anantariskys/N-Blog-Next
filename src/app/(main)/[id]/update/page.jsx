@@ -34,6 +34,8 @@ const UserProfileUpdate = () => {
     fetchData();
   }, [reset]);
 
+  console.log(user)
+
   useEffect(() => {
     if (watchedImage && watchedImage[0]) {
       setImagePreview(URL.createObjectURL(watchedImage[0]));
@@ -102,7 +104,7 @@ const UserProfileUpdate = () => {
         <div className="flex flex-col items-center mb-6">
           <div className="relative w-32 h-32 mb-4">
             <Image
-              src={imagePreview || user.image || "/api/placeholder/128/128"}
+              src={imagePreview ||user?.user.image}
               alt="Profile"
               layout="fill"
               objectFit="cover"
