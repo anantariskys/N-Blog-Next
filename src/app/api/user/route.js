@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "../../../../prisma/client";
 import jwt from "jsonwebtoken";
 import { initializeApp } from "firebase/app";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { v4 as uuidv4 } from 'uuid';
 
 
@@ -108,19 +108,33 @@ export async function PUT(request) {
     
     const updates = {};
 
-    
+    // Fetch current user data to get the existing image URL
+    const currentUser = await prisma.user.findUnique({
+      where: { id: decodedToken.userId },
+      select: { image: true }
+    });
+
     for (const key of allowedUpdates) {
       if (formData.has(key)) {
         if (key === 'image') {
           const file = formData.get(key);
           if (file && file.size > 0) {
+            if (currentUser.image && !currentUser.image.includes('default-profile-image')) {
+              const oldImageRef = ref(storage, currentUser.image);
+              try {
+                await deleteObject(oldImageRef);
+                console.log("Old image deleted successfully");
+              } catch (deleteError) {
+                console.error("Error deleting old image:", deleteError);
+              }
+            }
+
+            // Upload the new image
             const fileName = `${uuidv4()}-${file.name}`;
             const imageRef = ref(storage, `profile-images/${fileName}`);
-           const result =  await uploadBytes(imageRef, file);
-            console.log(result)
+            await uploadBytes(imageRef, file);
             const downloadURL = await getDownloadURL(imageRef);
             updates[key] = downloadURL;
-            console.log(downloadURL)
           }
         } else {
           updates[key] = formData.get(key);
@@ -138,6 +152,7 @@ export async function PUT(request) {
       },
       data: updates,
     });
+
     return NextResponse.json(
       {
         success: true,
